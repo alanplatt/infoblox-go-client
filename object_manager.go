@@ -521,6 +521,57 @@ func (objMgr *ObjectManager) DeleteHostRecord(ref string) (string, error) {
 	return objMgr.connector.DeleteObject(ref)
 }
 
+func (objMgr *ObjectManager) CreateSRVRecord(dnsview string, recordname string, port uint, priority uint, target string, weight uint, ea EA) (*RecordSRV, error) {
+
+	eas := objMgr.extendEA(ea)
+
+	recordSRV := NewRecordSRV(RecordSRV{
+		Name: recordname,
+		Port: port,
+		Priority: priority,
+		Target: target,
+		View: dnsview,
+		Weight: weight,
+		Ea:   eas})
+
+	ref, err := objMgr.connector.CreateObject(recordSRV)
+	recordSRV.Ref = ref
+	return recordSRV, err
+}
+
+func (objMgr *ObjectManager) GetSRVRecordByRef(ref string) (*RecordSRV, error) {
+	recordSRV := NewRecordSRV(RecordSRV{})
+	err := objMgr.connector.GetObject(recordSRV, ref, &recordSRV)
+	return recordSRV, err
+}
+
+func (objMgr *ObjectManager) DeleteSRVRecord(ref string) (string, error) {
+	return objMgr.connector.DeleteObject(ref)
+}
+
+
+func (objMgr *ObjectManager) UpdateSRVRecord(ref string, recordname string, port uint) (*RecordSRV, error) {
+
+	recordSRV := NewRecordSRV(RecordSRV{Name: recordname})
+
+	err := objMgr.connector.GetObject(recordSRV, ref, &recordSRV)
+
+	recordSRV.Port = port
+
+	recordSRV.View = ""
+
+
+	_, err = objMgr.connector.UpdateObject(recordSRV, ref)
+
+	if err != nil  {
+	 	return nil, err
+	}
+
+	return recordSRV, nil
+}
+
+
+
 func (objMgr *ObjectManager) CreateARecord(netview string, dnsview string, recordname string, cidr string, ipAddr string, ea EA) (*RecordA, error) {
 
 	eas := objMgr.extendEA(ea)

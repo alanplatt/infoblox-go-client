@@ -351,6 +351,26 @@ func NewUserProfile(userprofile UserProfile) *UserProfile {
 	return &res
 }
 
+type RecordSRV struct {
+	IBBase            `json:"-"`
+	Ref               string `json:"_ref,omitempty"`
+	Name              string `json:"name,omitempty"`
+	Port              uint   `json:"port,omitempty"`
+	Priority          uint   `json:"priority,omitempty"`
+	Target            string `json:"target,omitempty"`
+	View              string `json:"view,omitempty"`
+	Weight            uint   `json:"weight,omitempty"`
+	Ea                EA     `json:"extattrs,omitempty"`
+}
+
+func NewRecordSRV(ra RecordSRV) *RecordSRV {
+	res := ra
+	res.objectType = "record:srv"
+	res.returnFields = []string{"extattrs", "name", "port", "priority", "target", "view", "weight"}
+
+	return &res
+}
+
 type RecordA struct {
 	IBBase   `json:"-"`
 	Ref      string `json:"_ref,omitempty"`
