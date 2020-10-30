@@ -291,6 +291,37 @@ var _ = Describe("Objects", func() {
 			})
 		})
 
+		Context("RecordSRV object", func() {
+			name := "test1"
+			port := uint(1010)
+			priority := uint(5)
+			target := "a.target"
+			view := "default"
+			weight := uint(10)
+
+			ra := NewRecordSRV(RecordSRV{
+				Name:     name,
+				Port:     port,
+				Priority: priority,
+				Target:   target,
+				View:     view,
+			    Weight:   weight})
+
+			It("should set fields correctly", func() {
+				Expect(ra.Name).To(Equal(name))
+				Expect(ra.Port).To(Equal(port))
+				Expect(ra.Priority).To(Equal(priority))
+				Expect(ra.Target).To(Equal(target))
+				Expect(ra.View).To(Equal(view))
+				Expect(ra.Weight).To(Equal(weight))
+			})
+
+			It("should set base fields correctly", func() {
+				Expect(ra.ObjectType()).To(Equal("record:srv"))
+				Expect(ra.ReturnFields()).To(ConsistOf("extattrs", "name", "port", "priority", "target", "view", "weight"))
+			})
+		})
+
 		Context("RecordA object", func() {
 			ipv4addr := "1.1.1.1"
 			name := "bind_a.domain.com"
@@ -314,7 +345,7 @@ var _ = Describe("Objects", func() {
 				Expect(ra.ObjectType()).To(Equal("record:a"))
 				Expect(ra.ReturnFields()).To(ConsistOf("extattrs", "ipv4addr", "name", "view", "zone"))
 			})
-		})
+		})		
 
 		Context("RecordPtr object", func() {
 			ipv4addr := "1.1.1.1"
