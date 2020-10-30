@@ -633,6 +633,67 @@ var _ = Describe("Object Manager", func() {
 		})
 	})
 
+	Describe("Allocate specific SRV Record ", func() {
+		cmpType := "Docker"
+		tenantID := "01234567890abcdef01234567890abcdef"
+		dnsView := "default"
+		recordName := "test"
+		port := uint(1010)
+		priority := uint(5)
+		target := "a.target"
+		weight := uint(10)
+
+		fakeRefReturn := fmt.Sprintf("record:srv/ZG5zLmJpbmRfY25h:%s/%20%20", recordName)
+
+		aniFakeConnector := &fakeConnector{
+			createObjectObj: NewRecordSRV(RecordSRV{
+				Name:     recordName,
+				Port:     port,
+				Priority: priority,
+				Target:   target,
+				View:     dnsView,
+				Weight:   weight,
+			}),
+			getObjectRef: fakeRefReturn,
+			getObjectObj: NewRecordSRV(RecordSRV{
+				Name:     recordName,
+				Port:     port,
+				Priority: priority,
+				Target:   target,
+				View:     dnsView,
+				Weight:   weight,
+				Ref:      fakeRefReturn,
+			}),
+			resultObject: NewRecordSRV(RecordSRV{
+				Name:     recordName,
+				Port:     port,
+				Priority: priority,
+				Target:   target,
+				View:     dnsView,
+				Weight:   weight,
+				Ref:      fakeRefReturn,
+			}),
+			fakeRefReturn: fakeRefReturn,
+		}
+
+		objMgr := NewObjectManager(aniFakeConnector, cmpType, tenantID)
+
+		ea := objMgr.getBasicEA(true)
+		aniFakeConnector.createObjectObj.(*RecordSRV).Ea = ea
+		aniFakeConnector.resultObject.(*RecordSRV).Ea = ea
+		aniFakeConnector.getObjectObj.(*RecordSRV).Ea = ea
+
+		var actualRecord *RecordSRV
+		var err error
+		It("should pass expected SRV record Object to CreateObject", func() {
+			actualRecord, err = objMgr.CreateSRVRecord(dnsView, recordName, port, priority, target, weight, ea)
+		})
+		It("should return expected SRV record Object", func() {
+			Expect(actualRecord).To(Equal(aniFakeConnector.resultObject))
+			Expect(err).To(BeNil())
+		})
+	})
+
 	Describe("Allocate specific A Record ", func() {
 		cmpType := "Docker"
 		tenantID := "01234567890abcdef01234567890abcdef"
